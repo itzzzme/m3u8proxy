@@ -6,6 +6,26 @@ Welcome to the M3U8 Proxy Server! Tired of dealing with those pesky CORS errors 
 
 This Node.js application acts as a middleman between your requests and the M3U8 files you're trying to access. Just drop your M3U8 link into the input box, and we'll take care of the rest. Our server proxies the M3U8 file and provides you with a new link to use—free from CORS troubles.
 
+## Deployment
+
+### Vercel
+
+Host your own instance of anime-api on vercel
+
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://vercel.com/new/clone?repository-url=https://github.com/itzzzme/m3u8proxy)
+
+### Render
+
+Host your own instance of anime-api on Render.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/itzzzme/m3u8proxy)
+
+### Cloudflare-worker
+ - Create an example starter worker in your cloudflare account
+ - Edit the code of the worker after deploying it
+ - Override the code of your starter worker with the code given in `m3u8proxy(cf_worker).js`
+ - Deploy your worker
+
 ## 🚀 How It Works
 
 1. **Enter Your M3U8 Link**: Simply input your M3U8 URL into the provided input box.
