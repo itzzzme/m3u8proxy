@@ -19,7 +19,6 @@ export default function createServer(options) {
   const proxyServer = httpProxy.createProxyServer(httpProxyOptions);
   const requestHandler = getHandler(options, proxyServer);
   let server;
-
   const handleCors = (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
@@ -41,12 +40,70 @@ export default function createServer(options) {
   };
 
   if (options.httpsOptions) {
+    const origin = req.headers.origin || "";
+
+    // If the origin is blacklisted, block it
+    if (
+      options.originBlacklist.includes("*") &&
+      !options.originWhitelist.includes(origin)
+    ) {
+      res.writeHead(403, "Forbidden");
+      res.end(
+        'The origin "' +
+          origin +
+          '" was blacklisted by the operator of this proxy.'
+      );
+      return;
+    }
+
+    // If the origin is not in the whitelist, block it
+    if (
+      options.originWhitelist.length &&
+      options.originWhitelist.indexOf(origin) === -1
+    ) {
+      res.writeHead(403, "Forbidden");
+      res.end(
+        'The origin "' +
+          origin +
+          '" was not whitelisted by the operator of this proxy.'
+      );
+      return;
+    }
     server = https.createServer(options.httpsOptions, (req, res) => {
       if (handleCors(req, res)) return;
       requestHandler(req, res);
     });
   } else {
     server = http.createServer((req, res) => {
+      const origin = req.headers.origin || "";
+
+      // If the origin is blacklisted, block it
+      if (
+        options.originBlacklist.includes("*") &&
+        !options.originWhitelist.includes(origin)
+      ) {
+        res.writeHead(403, "Forbidden");
+        res.end(
+          'The origin "' +
+            origin +
+            '" was blacklisted by the operator of this proxy.'
+        );
+        return;
+      }
+
+      // If the origin is not in the whitelist, block it
+      if (
+        options.originWhitelist.length &&
+        options.originWhitelist.indexOf(origin) === -1
+      ) {
+        res.writeHead(403, "Forbidden");
+        res.end(
+          'The origin "' +
+            origin +
+            '" was not whitelisted by the operator of this proxy.'
+        );
+        return;
+      }
       if (handleCors(req, res)) return;
       requestHandler(req, res);
     });
