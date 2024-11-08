@@ -16,11 +16,11 @@ This Node.js application acts as a middleman between your requests and the M3U8 
 
 If you want to use the proxy directly, append your M3U8 link to the following URL:
 
-[https://m3u8proxy-ivory.vercel.app/m3u8-proxy?url={url}](https://m3u8proxy-ivory.vercel.app/m3u8-proxy?url={url})
+[https://<deployed_web_server>/m3u8-proxy?url={url}](https://<deployed_web_server>/m3u8-proxy?url={url})
 
 For example, if your M3U8 link is `https://example.com/stream.m3u8`, you would use:
 
-[https://m3u8proxy-ivory.vercel.app/m3u8-proxy?url=https://example.com/stream.m3u8](https://m3u8proxy-ivory.vercel.app/m3u8-proxy?url=https://example.com/stream.m3u8)
+[https://<deployed_web_server>/m3u8-proxy?url=https://example.com/stream.m3u8](https://<deployed_web_server>/m3u8-proxy?url=https://example.com/stream.m3u8)
 
 ## 🎥 Video Demo
 
