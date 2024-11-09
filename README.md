@@ -32,6 +32,16 @@ Host your own instance of anime-api on Render.
 2. **Get a Proxied Link**: Our server fetches the M3U8 file and proxies it for you.
 3. **Use the Proxied Link**: Replace your original link with the new proxied link in your platform.
 
+## <span>⚙️ Envs</span>
+
+More info can be found in [`.env.example`](https://github.com/itzzzme/m3u8proxy/blob/main/.env.example) file
+
+- `HOST`: host of your proxy server `optional`
+- `PORT`: port number (any) `optional`
+- `PUBLIC_URL`: link of your website  `mandatory`
+- `ALLOWED_ORIGINS`: origins you want to allow  `mandatory`
+
+
 ## 🕵️‍♂️ How to Use
 
 If you want to use the proxy directly, append your M3U8 link to the following URL:
