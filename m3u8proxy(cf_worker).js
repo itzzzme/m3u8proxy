@@ -1,4 +1,4 @@
-addEventListener("fetch", event => {
+addEventListener("fetch", (event) => {
   event.respondWith(handleRequest(event.request));
 });
 
@@ -14,11 +14,26 @@ async function handleRequest(request) {
   return new Response("Not Found", { status: 404 });
 }
 
+const options = {
+  originBlacklist: ["*"], // Replace with specific origins if needed
+  originWhitelist: [], // Add allowed origins if applicable
+};
+
 async function handleM3U8Proxy(request) {
   const { searchParams } = new URL(request.url);
   const targetUrl = searchParams.get("url");
   const headers = JSON.parse(searchParams.get("headers") || "{}");
+  const origin = request.headers.get("Origin") || "";
 
+  if (
+    options.originBlacklist.includes("*") &&
+    !options.originWhitelist.includes(origin)
+  ) {
+    return new Response(
+      `The origin "${origin}" was blacklisted by the operator of this proxy.`,
+      { status: 403 }
+    );
+  }
   if (!targetUrl) {
     return new Response("URL is required", { status: 400 });
   }
@@ -26,32 +41,40 @@ async function handleM3U8Proxy(request) {
   try {
     const response = await fetch(targetUrl, { headers });
     if (!response.ok) {
-      return new Response("Failed to fetch the m3u8 file", { status: response.status });
+      return new Response("Failed to fetch the m3u8 file", {
+        status: response.status,
+      });
     }
 
     let m3u8 = await response.text();
     m3u8 = m3u8
       .split("\n")
-      .filter(line => !line.startsWith("#EXT-X-MEDIA:TYPE=AUDIO"))
+      .filter((line) => !line.startsWith("#EXT-X-MEDIA:TYPE=AUDIO"))
       .join("\n");
 
     if (m3u8.includes("RESOLUTION=")) {
       const lines = m3u8.split("\n");
       const newLines = [];
 
-      lines.forEach(line => {
+      lines.forEach((line) => {
         if (line.startsWith("#")) {
           if (line.startsWith("#EXT-X-KEY:")) {
             const regex = /https?:\/\/[^\""\s]+/g;
             const keyUrl = regex.exec(line)?.[0] ?? "";
-            const newUrl = `/ts-proxy?url=${encodeURIComponent(keyUrl)}&headers=${encodeURIComponent(JSON.stringify(headers))}`;
+            const newUrl = `/ts-proxy?url=${encodeURIComponent(
+              keyUrl
+            )}&headers=${encodeURIComponent(JSON.stringify(headers))}`;
             newLines.push(line.replace(keyUrl, newUrl));
           } else {
             newLines.push(line);
           }
         } else {
           const uri = new URL(line, targetUrl);
-          newLines.push(`/m3u8-proxy?url=${encodeURIComponent(uri.href)}&headers=${encodeURIComponent(JSON.stringify(headers))}`);
+          newLines.push(
+            `/m3u8-proxy?url=${encodeURIComponent(
+              uri.href
+            )}&headers=${encodeURIComponent(JSON.stringify(headers))}`
+          );
         }
       });
 
@@ -68,19 +91,25 @@ async function handleM3U8Proxy(request) {
     const lines = m3u8.split("\n");
     const newLines = [];
 
-    lines.forEach(line => {
+    lines.forEach((line) => {
       if (line.startsWith("#")) {
         if (line.startsWith("#EXT-X-KEY:")) {
           const regex = /https?:\/\/[^\""\s]+/g;
           const keyUrl = regex.exec(line)?.[0] ?? "";
-          const newUrl = `/ts-proxy?url=${encodeURIComponent(keyUrl)}&headers=${encodeURIComponent(JSON.stringify(headers))}`;
+          const newUrl = `/ts-proxy?url=${encodeURIComponent(
+            keyUrl
+          )}&headers=${encodeURIComponent(JSON.stringify(headers))}`;
           newLines.push(line.replace(keyUrl, newUrl));
         } else {
           newLines.push(line);
         }
       } else {
         const uri = new URL(line, targetUrl);
-        newLines.push(`/ts-proxy?url=${encodeURIComponent(uri.href)}&headers=${encodeURIComponent(JSON.stringify(headers))}`);
+        newLines.push(
+          `/ts-proxy?url=${encodeURIComponent(
+            uri.href
+          )}&headers=${encodeURIComponent(JSON.stringify(headers))}`
+        );
       }
     });
 
@@ -101,14 +130,25 @@ async function handleTsProxy(request) {
   const { searchParams } = new URL(request.url);
   const targetUrl = searchParams.get("url");
   const headers = JSON.parse(searchParams.get("headers") || "{}");
+  const origin = request.headers.get("Origin") || "";
 
+  if (
+    options.originBlacklist.includes("*") &&
+    !options.originWhitelist.includes(origin)
+  ) {
+    return new Response(
+      `The origin "${origin}" was blacklisted by the operator of this proxy.`,
+      { status: 403 }
+    );
+  }
   if (!targetUrl) {
     return new Response("URL is required", { status: 400 });
   }
 
   const url = new URL(targetUrl);
   const requestHeaders = new Headers({
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
+    "User-Agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
     ...headers,
   });
 
@@ -119,7 +159,9 @@ async function handleTsProxy(request) {
     });
 
     if (!response.ok) {
-      return new Response("Failed to fetch segment", { status: response.status });
+      return new Response("Failed to fetch segment", {
+        status: response.status,
+      });
     }
 
     const contentType = "video/mp2t";
