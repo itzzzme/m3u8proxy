@@ -65,7 +65,7 @@ export default function createServer(options) {
       res.end(
         'The origin "' +
           origin +
-          '" was not whitelisted by the operator of this proxy.'
+          '" was blacklisted by the operator of this proxy.'
       );
       return;
     }
@@ -100,7 +100,7 @@ export default function createServer(options) {
         res.end(
           'The origin "' +
             origin +
-            '" was not whitelisted by the operator of this proxy.'
+            '" was blacklisted by the operator of this proxy.'
         );
         return;
       }
