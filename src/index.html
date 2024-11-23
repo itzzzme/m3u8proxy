@@ -166,7 +166,9 @@
         resultDiv.style.display = "block";
         resultDiv.innerHTML = `<span class="result-label">PROXIED_URL: </span><a href="/m3u8-proxy?url=${encodeURIComponent(
           url
-        )}" target="_blank">/m3u8-proxy?url=${encodeURIComponent(url)}</a>`;
+        )}" target="_blank">${
+          window.location.href
+        }m3u8-proxy?url=${encodeURIComponent(url)}</a>`;
 
         const video = document.getElementById("player");
         if (hls) {
