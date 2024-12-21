@@ -10,13 +10,13 @@ This Node.js application acts as a middleman between your requests and the M3U8 
 
 ### Vercel
 
-Host your own instance of anime-api on vercel
+Host your own instance of M3U8-Proxy on vercel
 
 [![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://vercel.com/new/clone?repository-url=https://github.com/itzzzme/m3u8proxy)
 
 ### Render
 
-Host your own instance of anime-api on Render.
+Host your own instance of M3U8-Proxy on Render.
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/itzzzme/m3u8proxy)
 
