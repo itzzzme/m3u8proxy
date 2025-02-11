@@ -12,8 +12,7 @@ This Node.js application acts as a middleman between your requests and the M3U8 
 
 Host your own instance of M3U8-Proxy on vercel
 
-[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://vercel.com/new/clone?repository-url=https://github.com/itzzzme/m3u8proxy)
-
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/itzzzme/m3u8proxy)
 ### Render
 
 Host your own instance of M3U8-Proxy on Render.
