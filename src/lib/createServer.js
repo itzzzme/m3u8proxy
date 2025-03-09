@@ -77,7 +77,7 @@ export default function createServer(options) {
       const origin = req.headers.origin || "";
       if (!isOriginAllowed(origin, options)) {
         res.writeHead(403, "Forbidden");
-        res.end(`The origin "${origin}" is not allowed.`);
+        res.end(`The origin "${origin}" was blacklisted by the operator of this proxy.`);
         return;
       }
       if (handleCors(req, res)) return;
