@@ -15,8 +15,27 @@ async function handleRequest(request) {
 }
 
 const options = {
-  originBlacklist: ["*"], // Replace with specific origins if needed
-  originWhitelist: [], // Add allowed origins if applicable
+  originBlacklist: [],
+  originWhitelist: ["*"],
+};
+
+const isOriginAllowed = (origin, options) => {
+  if (options.originWhitelist.includes("*")) {
+    return true;
+  }
+  if (
+    options.originWhitelist.length &&
+    !options.originWhitelist.includes(origin)
+  ) {
+    return false;
+  }
+  if (
+    options.originBlacklist.length &&
+    options.originBlacklist.includes(origin)
+  ) {
+    return false;
+  }
+  return true;
 };
 
 async function handleM3U8Proxy(request) {
@@ -25,14 +44,10 @@ async function handleM3U8Proxy(request) {
   const headers = JSON.parse(searchParams.get("headers") || "{}");
   const origin = request.headers.get("Origin") || "";
 
-  if (
-    options.originBlacklist.includes("*") &&
-    !options.originWhitelist.includes(origin)
-  ) {
-    return new Response(
-      `The origin "${origin}" was blacklisted by the operator of this proxy.`,
-      { status: 403 }
-    );
+  if (!isOriginAllowed(origin, options)) {
+    return new Response(`The origin "${origin}" is not allowed.`, {
+      status: 403,
+    });
   }
   if (!targetUrl) {
     return new Response("URL is required", { status: 400 });
@@ -51,42 +66,6 @@ async function handleM3U8Proxy(request) {
       .split("\n")
       .filter((line) => !line.startsWith("#EXT-X-MEDIA:TYPE=AUDIO"))
       .join("\n");
-
-    if (m3u8.includes("RESOLUTION=")) {
-      const lines = m3u8.split("\n");
-      const newLines = [];
-
-      lines.forEach((line) => {
-        if (line.startsWith("#")) {
-          if (line.startsWith("#EXT-X-KEY:")) {
-            const regex = /https?:\/\/[^\""\s]+/g;
-            const keyUrl = regex.exec(line)?.[0] ?? "";
-            const newUrl = `/ts-proxy?url=${encodeURIComponent(
-              keyUrl
-            )}&headers=${encodeURIComponent(JSON.stringify(headers))}`;
-            newLines.push(line.replace(keyUrl, newUrl));
-          } else {
-            newLines.push(line);
-          }
-        } else {
-          const uri = new URL(line, targetUrl);
-          newLines.push(
-            `/m3u8-proxy?url=${encodeURIComponent(
-              uri.href
-            )}&headers=${encodeURIComponent(JSON.stringify(headers))}`
-          );
-        }
-      });
-
-      return new Response(newLines.join("\n"), {
-        headers: {
-          "Content-Type": "application/vnd.apple.mpegurl",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers": "*",
-          "Access-Control-Allow-Methods": "*",
-        },
-      });
-    }
 
     const lines = m3u8.split("\n");
     const newLines = [];
@@ -132,30 +111,23 @@ async function handleTsProxy(request) {
   const headers = JSON.parse(searchParams.get("headers") || "{}");
   const origin = request.headers.get("Origin") || "";
 
-  if (
-    options.originBlacklist.includes("*") &&
-    !options.originWhitelist.includes(origin)
-  ) {
-    return new Response(
-      `The origin "${origin}" was blacklisted by the operator of this proxy.`,
-      { status: 403 }
-    );
+  if (!isOriginAllowed(origin, options)) {
+    return new Response(`The origin "${origin}" is not allowed.`, {
+      status: 403,
+    });
   }
   if (!targetUrl) {
     return new Response("URL is required", { status: 400 });
   }
 
-  const url = new URL(targetUrl);
-  const requestHeaders = new Headers({
-    "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
-    ...headers,
-  });
-
   try {
-    const response = await fetch(url.href, {
+    const response = await fetch(targetUrl, {
       method: request.method,
-      headers: requestHeaders,
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
+        ...headers,
+      },
     });
 
     if (!response.ok) {
@@ -164,11 +136,10 @@ async function handleTsProxy(request) {
       });
     }
 
-    const contentType = "video/mp2t";
     return new Response(response.body, {
       status: response.status,
       headers: {
-        "Content-Type": contentType,
+        "Content-Type": "video/mp2t",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "*",
         "Access-Control-Allow-Methods": "*",
