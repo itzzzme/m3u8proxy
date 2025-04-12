@@ -177,13 +177,13 @@
 
         if (Hls.isSupported()) {
           hls = new Hls();
-          hls.loadSource(`/m3u8-proxy?url=${encodeURIComponent(url)}`);
+          hls.loadSource(`/m3u8-proxy?url=${url}`);
           hls.attachMedia(video);
           hls.on(Hls.Events.MANIFEST_PARSED, function () {
             video.play();
           });
         } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-          video.src = `/m3u8-proxy?url=${encodeURIComponent(url)}`;
+          video.src = `/m3u8-proxy?url=${url}`;
           video.addEventListener("loadedmetadata", function () {
             video.play();
           });
