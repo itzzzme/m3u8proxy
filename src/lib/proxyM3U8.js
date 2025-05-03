@@ -20,7 +20,7 @@ export default async function proxyM3U8(url, headers, res) {
   }
   const m3u8 = req.data
     .split("\n")
-    //now it supports also proxying multi-audio support
+    //now it supports also proxying multi-audio streams
     // .filter((line) => !line.startsWith("#EXT-X-MEDIA:TYPE=AUDIO"))
     .join("\n");
   if (m3u8.includes("RESOLUTION=")) {
